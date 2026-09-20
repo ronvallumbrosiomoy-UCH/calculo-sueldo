@@ -351,8 +351,14 @@
 /* ============ SUPABASE ============ */
 const SUPABASE_URL = 'https://qnxudmepbmxdqgrivnhr.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFueHVkbWVwYm14ZHFncml2bmhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MTAyMjAsImV4cCI6MjEwNTQ4NjIyMH0.9r1bhAFvkHN3efZk2I3tJmBWfekKjV0XeqorcvChDDY';
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
-if (!supabase) { document.getElementById('loginScreen').innerHTML='<h2>Error</h2><p>No se pudo cargar Supabase JS. Recarga la página.</p>'; }
+let supabase = null;
+try {
+  supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+  console.log("Supabase client:", supabase ? "OK" : "null", typeof supabase?.auth);
+} catch(e) {
+  console.error("Supabase init error:", e);
+  document.getElementById('loginScreen').innerHTML='<h2>Error</h2><p>Error de conexión: '+e.message+'</p>';
+}
 
 /* ============ ESTADO ============ */
 const tasasAFP = { Integra: 0.1275, Prima: 0.1280, Profuturo: 0.1280, Habitat: 0.1230 };
@@ -513,7 +519,9 @@ function showLogin() {
   document.getElementById("loginScreen").style.display="flex";
   document.getElementById("appSection").style.display="none";
 }
-document.getElementById("btnGitHubLogin").addEventListener("click", async ()=>{
+const btn = document.getElementById("btnGitHubLogin");
+if (btn) btn.addEventListener("click", async ()=>{
+  if (!supabase) { toast("Sesión inválida. Recarga."); return; }
   try {
     toast("Redirigiendo a GitHub...");
     const redirectTo = window.location.origin + window.location.pathname;
@@ -528,9 +536,7 @@ document.getElementById("btnGitHubLogin").addEventListener("click", async ()=>{
   }
 });
 // Detectar si viene del login OAuth
-supabase.auth.getSession().then(({ data: { session } })=>{
-  if (session) showApp();
-});
+if (supabase) supabase.auth.getSession().then(({ data: { session } })=>{ if (session) showApp(); });
 
 /* ============ TOAST ============ */
 let toastTimer=null;
@@ -543,8 +549,8 @@ themeBtn.addEventListener("click",()=>{ const n=document.body.dataset.theme==="d
 (function(){ const s=localStorage.getItem("sueldoTheme"); const sys=window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"; applyTheme(s||sys); })();
 
 /* ============ INIT ============ */
-document.getElementById("refreshBtn").addEventListener("click", cargarHistorial);
-checkSession();
+if (supabase && document.getElementById("refreshBtn")) document.getElementById("refreshBtn").addEventListener("click", cargarHistorial);
+if (supabase) checkSession();
 </script>
 </body>
 </html>
