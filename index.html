@@ -6,7 +6,7 @@
 <title>Calculadora de Sueldo Neto — Perú</title>
 <meta name="description" content="Calcula tu sueldo neto en Perú con ONP/AFP, horas extra, bono nocturno y renta de 5ta categoría. Guarda el historial mes a mes con gráficas." />
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
 <style>
   :root {
     --bg: #f5f5f7;
@@ -351,7 +351,8 @@
 /* ============ SUPABASE ============ */
 const SUPABASE_URL = 'https://qnxudmepbmxdqgrivnhr.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFueHVkbWVwYm14ZHFncml2bmhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MTAyMjAsImV4cCI6MjEwNTQ4NjIyMH0.9r1bhAFvkHN3efZk2I3tJmBWfekKjV0XeqorcvChDDY';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+if (!supabase) { document.getElementById('loginScreen').innerHTML='<h2>Error</h2><p>No se pudo cargar Supabase JS. Recarga la página.</p>'; }
 
 /* ============ ESTADO ============ */
 const tasasAFP = { Integra: 0.1275, Prima: 0.1280, Profuturo: 0.1280, Habitat: 0.1230 };
@@ -515,8 +516,12 @@ function showLogin() {
 document.getElementById("btnGitHubLogin").addEventListener("click", async ()=>{
   try {
     toast("Redirigiendo a GitHub...");
-    const { error } = await supabase.auth.signInWithOAuth({ provider:"github", options:{ redirectTo: window.location.href } });
+    const redirectTo = window.location.origin + window.location.pathname;
+    console.log("Redirect to:", redirectTo);
+    console.log("Supabase client:", !!supabase, "createClient type:", typeof supabase?.createClient);
+    const { error } = await supabase.auth.signInWithOAuth({ provider:"github", options:{ redirectTo } });
     if (error) toast("Error: "+error.message);
+    else console.log("OAuth initiated, checking redirect...");
   } catch(e) {
     toast("Error: "+e.message);
     console.error(e);
