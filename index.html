@@ -513,8 +513,14 @@ function showLogin() {
   document.getElementById("appSection").style.display="none";
 }
 document.getElementById("btnGitHubLogin").addEventListener("click", async ()=>{
-  const { error } = await supabase.auth.signInWithOAuth({ provider:"github", options:{ redirectTo: window.location.href } });
-  if (error) toast("Error de autenticación: "+error.message);
+  try {
+    toast("Redirigiendo a GitHub...");
+    const { error } = await supabase.auth.signInWithOAuth({ provider:"github", options:{ redirectTo: window.location.href } });
+    if (error) toast("Error: "+error.message);
+  } catch(e) {
+    toast("Error: "+e.message);
+    console.error(e);
+  }
 });
 // Detectar si viene del login OAuth
 supabase.auth.getSession().then(({ data: { session } })=>{
