@@ -6,6 +6,7 @@
 <title>Calculadora de Sueldo Neto — Perú</title>
 <meta name="description" content="Calcula tu sueldo neto en Perú con ONP/AFP, horas extra, bono nocturno y renta de 5ta categoría. Guarda el historial mes a mes con gráficas." />
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
   :root {
     --bg: #f5f5f7;
@@ -316,10 +317,11 @@
         <div class="result-row"><span class="lbl">Remuneración bruta</span><span class="val" id="rBruta">S/ 0.00</span></div>
         <div class="result-row disc"><span class="lbl">Descuento ONP/AFP</span><span class="val" id="rDesc">S/ 0.00</span></div>
         <div class="result-row disc"><span class="lbl">Renta 5ta categoría</span><span class="val" id="rRenta">S/ 0.00</span></div>
-        <div class="actions">
-          <button class="btn" id="saveBtn">Guardar este mes</button>
-          <button class="btn secondary" id="refreshBtn" title="Recargar datos">↻</button>
-        </div>
+<div class="actions">
+           <button class="btn" id="saveBtn">Guardar este mes</button>
+           <button class="btn secondary" id="exportBtn" title="Exportar PDF">📄 PDF</button>
+           <button class="btn secondary" id="refreshBtn" title="Recargar datos">↻</button>
+         </div>
       </div>
     </section>
 
@@ -343,6 +345,15 @@
     <footer>Valores referenciales · tasas AFP y UIT editables · verifica con tu boleta y SUNAT/SBS.</footer>
   </section>
 </main>
+
+<!-- CONTENIDO PARA PDF (oculto) -->
+<div id="pdfContent" style="display:none; padding:20px; font-family:'Inter',-apple-system,sans-serif; color:#1d1d1f; max-width:210mm;">
+  <div style="text-align:center; margin-bottom:20px; border-bottom:3px solid #0a84ff; padding-bottom:12px;">
+    <h1 style="font-size:1.5rem; margin:0;">📋 Calculadora de Sueldo Neto — Perú</h1>
+    <p style="color:#6e6e73; margin:4px 0 0;">Resumen mensual</p>
+  </div>
+  <div id="pdfDetails"></div>
+</div>
 
 <div id="toast"></div>
 
@@ -458,6 +469,39 @@ async function guardarMes() {
   toast("Mes guardado ✓");
 }
 document.getElementById("saveBtn").addEventListener("click", guardarMes);
+document.getElementById("exportBtn").addEventListener("click", ()=>exportarPDF(calcular()));
+
+/* ============ EXPORTAR PDF ============ */
+async function exportarPDF(c) {
+  const details = document.getElementById("pdfDetails");
+  if (!details) { toast("PDF no disponible"); return; }
+  const fecha = new Date().toLocaleDateString("es-PE");
+  details.innerHTML = `
+    <table style="width:100%; border-collapse:collapse; margin-top:12px; font-size:0.9rem;">
+      <tr style="background:#f5f5f7;"><th style="text-align:left; padding:8px; border-bottom:1px solid #ddd;">Concepto</th><th style="text-align:right; padding:8px; border-bottom:1px solid #ddd;">Monto (S/)</th></tr>
+      <tr><td style="padding:6px 8px;">Sueldo bruto mensual</td><td style="text-align:right; padding:6px 8px;">${fmt(c.bruto)}</td></tr>
+      <tr style="background:#fafafa;"><td style="padding:6px 8px;">Días trabajados</td><td style="text-align:right; padding:6px 8px;">${c.dias}</td></tr>
+      <tr><td style="padding:6px 8px;">Horas extra</td><td style="text-align:right; padding:6px 8px;">${c.hextra}h</td></tr>
+      <tr style="background:#fafafa;"><td style="padding:6px 8px;">Turno</td><td style="text-align:right; padding:6px 8px;">${c.turno}</td></tr>
+      <tr><td style="padding:6px 8px;">Sistema previsional</td><td style="text-align:right; padding:6px 8px;">${c.sistema}</td></tr>
+      <tr style="background:#fafafa;"><td style="padding:6px 8px;">Bono nocturno</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rBono)}</td></tr>
+      <tr><td style="padding:6px 8px;">Remuneración bruta</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rBruta)}</td></tr>
+      <tr style="background:#fafafa;"><td style="padding:6px 8px;">Descuento ONP/AFP</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rDesc)}</td></tr>
+      <tr><td style="padding:6px 8px;">Renta 5ta categoría</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rRenta)}</td></tr>
+      <tr style="background:#e8f0fe; font-weight:700;"><td style="padding:10px 8px; border-top:2px solid #0a84ff;">SUELDO NETO</td><td style="text-align:right; padding:10px 8px; border-top:2px solid #0a84ff; color:#0a84ff;">${fmt(c.neto)}</td></tr>
+    </table>
+    <p style="color:#6e6e73; font-size:0.75rem; margin-top:16px;">Generado el ${fecha} · Calculadora de Sueldo Neto — Perú</p>`;
+  const opt = {
+    margin: 10, filename: `sueldo_${c.anio||new Date().getFullYear()}_${String(c.mes||new Date().getMonth()+1).padStart(2,"0")}.pdf`,
+    image: { type: "jpeg", quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, logging: false },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+  };
+  try {
+    toast("Generando PDF...");
+    await html2pdf().set(opt).from(document.getElementById("pdfContent")).save();
+    toast("PDF descargado ✓");
+  } catch(e) { toast("Error al generar PDF: "+e.message); }
+}
 
 async function borrarMes(id) {
   const { error } = await sb.from("sueldos").delete().eq("id", id);
