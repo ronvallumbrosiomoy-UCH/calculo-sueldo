@@ -351,10 +351,10 @@
 /* ============ SUPABASE ============ */
 const SUPABASE_URL = 'https://qnxudmepbmxdqgrivnhr.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFueHVkbWVwYm14ZHFncml2bmhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MTAyMjAsImV4cCI6MjEwNTQ4NjIyMH0.9r1bhAFvkHN3efZk2I3tJmBWfekKjV0XeqorcvChDDY';
-let supabase = null;
+let sbClient = null;
 try {
-  supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
-  console.log("Supabase client:", supabase ? "OK" : "null", typeof supabase?.auth);
+  sbClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+  console.log("Supabase client:", sbClient ? "OK" : "null", typeof sbClient?.auth);
 } catch(e) {
   console.error("Supabase init error:", e);
   document.getElementById('loginScreen').innerHTML='<h2>Error</h2><p>Error de conexión: '+e.message+'</p>';
@@ -448,11 +448,11 @@ async function guardarMes() {
   const now = new Date();
   const anio = now.getFullYear(), mes = now.getMonth()+1;
   const clave = `${anio}-${String(mes).padStart(2,"0")}`;
-  const { data: existing } = await supabase.from("sueldos").select("id").eq("mes", mes).eq("anio", anio).single();
+  const { data: existing } = await sbClient.from("sueldos").select("id").eq("mes", mes).eq("anio", anio).single();
   if (existing) { toast("Este mes ya está guardado."); return; }
-  const { data: profile } = await supabase.from("perfiles").select("id").single();
+  const { data: profile } = await sbClient.from("perfiles").select("id").single();
   if (!profile) { toast("Sesión inválida. Vuelve a iniciar."); return; }
-  const { error } = await supabase.from("sueldos").insert({
+  const { error } = await sbClient.from("sueldos").insert({
     usuario_id: profile.id, mes, anio,
     sueldo_bruto: c.bruto, dias_trabajados: c.dias, horas_extra: c.hextra,
     tipo_turno: c.turno, dias_noche: c.diasNoche, tasa_bono: c.bonoTasa,
@@ -467,7 +467,7 @@ async function guardarMes() {
 document.getElementById("saveBtn").addEventListener("click", guardarMes);
 
 async function borrarMes(id) {
-  const { error } = await supabase.from("sueldos").delete().eq("id", id);
+  const { error } = await sbClient.from("sueldos").delete().eq("id", id);
   if (error) { toast("Error al borrar"); return; }
   await cargarHistorial();
   toast("Mes eliminado");
@@ -476,7 +476,7 @@ async function borrarMes(id) {
 /* ============ CARGAR HISTORIAL ============ */
 async function cargarHistorial() {
   const wrap = document.getElementById("tableWrap");
-  const { data, error } = await supabase.from("sueldos").select("*").order("anio", {ascending:true}).order("mes", {ascending:true});
+  const { data, error } = await sbClient.from("sueldos").select("*").order("anio", {ascending:true}).order("mes", {ascending:true});
   if (error || !data) { wrap.innerHTML='<div class="empty">Sin datos guardados.</div>'; drawCharts(); return; }
   hist = data;
   const meses=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
@@ -506,7 +506,7 @@ function drawCharts(){
 
 /* ============ AUTH ============ */
 async function checkSession() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { session } } = await sbClient.auth.getSession();
   if (session) { showApp(); await cargarHistorial(); }
   else { showLogin(); }
 }
@@ -521,13 +521,13 @@ function showLogin() {
 }
 const btn = document.getElementById("btnGitHubLogin");
 if (btn) btn.addEventListener("click", async ()=>{
-  if (!supabase) { toast("Sesión inválida. Recarga."); return; }
+  if (!sbClient) { toast("Sesión inválida. Recarga."); return; }
   try {
     toast("Redirigiendo a GitHub...");
     const redirectTo = window.location.origin + window.location.pathname;
     console.log("Redirect to:", redirectTo);
-    console.log("Supabase client:", !!supabase, "createClient type:", typeof supabase?.createClient);
-    const { error } = await supabase.auth.signInWithOAuth({ provider:"github", options:{ redirectTo } });
+    console.log("Supabase client:", !!sbClient, "createClient type:", typeof sbClient?.createClient);
+    const { error } = await sbClient.auth.signInWithOAuth({ provider:"github", options:{ redirectTo } });
     if (error) toast("Error: "+error.message);
     else console.log("OAuth initiated, checking redirect...");
   } catch(e) {
@@ -536,7 +536,7 @@ if (btn) btn.addEventListener("click", async ()=>{
   }
 });
 // Detectar si viene del login OAuth
-if (supabase) supabase.auth.getSession().then(({ data: { session } })=>{ if (session) showApp(); });
+if (sbClient) sbClient.auth.getSession().then(({ data: { session } })=>{ if (session) showApp(); });
 
 /* ============ TOAST ============ */
 let toastTimer=null;
@@ -549,8 +549,8 @@ themeBtn.addEventListener("click",()=>{ const n=document.body.dataset.theme==="d
 (function(){ const s=localStorage.getItem("sueldoTheme"); const sys=window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"; applyTheme(s||sys); })();
 
 /* ============ INIT ============ */
-if (supabase && document.getElementById("refreshBtn")) document.getElementById("refreshBtn").addEventListener("click", cargarHistorial);
-if (supabase) checkSession();
+if (sbClient && document.getElementById("refreshBtn")) document.getElementById("refreshBtn").addEventListener("click", cargarHistorial);
+if (sbClient) checkSession();
 </script>
 </body>
 </html>
