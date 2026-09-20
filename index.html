@@ -4,191 +4,124 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Calculadora de Sueldo Neto — Perú</title>
-<meta name="description" content="Calcula tu sueldo neto en Perú con ONP/AFP, horas extra, bono nocturno y renta de 5ta categoría. Guarda el historial mes a mes con gráficas." />
+<meta name="description" content="Calcula tu sueldo neto en Perú con ONP/AFP, horas extra, bono nocturno y renta. Login seguro y datos en la nube." />
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #f5f5f7;
-    --bg-grad1: #eef0f6;
-    --bg-grad2: #ffffff;
-    --text: #1d1d1f;
-    --text2: #6e6e73;
-    --card: rgba(255,255,255,0.72);
-    --card-border: rgba(255,255,255,0.5);
-    --input-bg: rgba(255,255,255,0.65);
-    --input-border: rgba(60,60,67,0.14);
-    --accent: #0a84ff;
-    --accent2: #375623;
-    --chip-bg: rgba(120,120,128,0.12);
-    --chip-bg-2: rgba(120,120,128,0.08);
-    --shadow: 0 10px 40px rgba(0,0,0,0.08);
-    --neto: #1d1d1f;
-    --glass-blur: 24px;
+    --bg: #f5f5f7; --bg-grad1: #eef0f6; --bg-grad2: #ffffff;
+    --text: #1d1d1f; --text2: #6e6e73;
+    --card: rgba(255,255,255,0.72); --card-border: rgba(255,255,255,0.5);
+    --input-bg: rgba(255,255,255,0.65); --input-border: rgba(60,60,67,0.14);
+    --accent: #0a84ff; --accent2: #375623;
+    --chip-bg: rgba(120,120,128,0.12); --chip-bg-2: rgba(120,120,128,0.08);
+    --shadow: 0 10px 40px rgba(0,0,0,0.08); --neto: #1d1d1f; --glass-blur: 24px;
   }
   [data-theme="dark"] {
-    --bg: #000000;
-    --bg-grad1: #0a0a0f;
-    --bg-grad2: #1c1c1e;
-    --text: #f5f5f7;
-    --text2: #a1a1a6;
-    --card: rgba(30,30,32,0.7);
-    --card-border: rgba(255,255,255,0.12);
-    --input-bg: rgba(60,60,67,0.5);
-    --input-border: rgba(255,255,255,0.16);
-    --accent: #0a84ff;
-    --accent2: #c6efce;
-    --chip-bg: rgba(120,120,128,0.24);
-    --chip-bg-2: rgba(120,120,128,0.16);
-    --shadow: 0 10px 40px rgba(0,0,0,0.5);
-    --neto: #ffffff;
+    --bg: #000000; --bg-grad1: #0a0a0f; --bg-grad2: #1c1c1e;
+    --text: #f5f5f7; --text2: #a1a1a6;
+    --card: rgba(30,30,32,0.7); --card-border: rgba(255,255,255,0.12);
+    --input-bg: rgba(60,60,67,0.5); --input-border: rgba(255,255,255,0.16);
+    --accent: #0a84ff; --accent2: #c6efce;
+    --chip-bg: rgba(120,120,128,0.24); --chip-bg-2: rgba(120,120,128,0.16);
+    --shadow: 0 10px 40px rgba(0,0,0,0.5); --neto: #ffffff;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { -webkit-font-smoothing: antialiased; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
     background: var(--bg);
-    background-image: radial-gradient(1200px 800px at 80% -10%, var(--bg-grad1), transparent),
-                      radial-gradient(900px 600px at 0% 10%, var(--bg-grad2), transparent);
-    color: var(--text);
-    line-height: 1.5;
-    transition: background 0.4s ease, color 0.4s ease;
-    min-height: 100vh;
+    background-image: radial-gradient(1200px 800px at 80% -10%, var(--bg-grad1), transparent), radial-gradient(900px 600px at 0% 10%, var(--bg-grad2), transparent);
+    color: var(--text); line-height: 1.5;
+    transition: background .4s ease, color .4s ease; min-height: 100vh;
   }
-  /* Glass material */
-  .glass {
-    background: var(--card);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    border: 1px solid var(--card-border);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-  }
-  /* Top bar */
-  .topbar {
-    position: sticky; top: 0; z-index: 50;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 24px;
-    background: color-mix(in srgb, var(--card) 72%, transparent);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    border-bottom: 1px solid var(--card-border);
-  }
+  .glass { background: var(--card); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%); backdrop-filter: blur(var(--glass-blur)) saturate(180%); border: 1px solid var(--card-border); border-radius: 24px; box-shadow: var(--shadow); }
+  .topbar { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; background: color-mix(in srgb, var(--card) 72%, transparent); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%); backdrop-filter: blur(var(--glass-blur)) saturate(180%); border-bottom: 1px solid var(--card-border); }
   .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 17px; letter-spacing: -0.01em; }
-  .brand .logo {
-    width: 26px; height: 26px; border-radius: 8px;
-    background: linear-gradient(135deg, var(--accent), #5e5ce6);
-    display: grid; place-items: center; color: #fff; font-size: 15px; font-weight: 700;
-  }
+  .brand .logo { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), #5e5ce6); display: grid; place-items: center; color: #fff; font-size: 15px; font-weight: 700; }
   .nav-links { display: flex; gap: 8px; align-items: center; }
-  .nav-links a {
-    color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 500;
-    padding: 7px 12px; border-radius: 999px; transition: color .2s, background .2s;
-  }
+  .nav-links a { color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 500; padding: 7px 12px; border-radius: 999px; transition: color .2s, background .2s; }
   .nav-links a:hover { color: var(--text); }
   .nav-links a.active { color: var(--text); background: var(--chip-bg); }
-  .theme-btn {
-    border: 0; cursor: pointer; background: var(--chip-bg); color: var(--text);
-    width: 38px; height: 38px; border-radius: 50%; font-size: 17px;
-    display: grid; place-items: center; transition: transform .15s, background .2s;
-  }
+  .theme-btn { border: 0; cursor: pointer; background: var(--chip-bg); color: var(--text); width: 38px; height: 38px; border-radius: 50%; font-size: 17px; display: grid; place-items: center; transition: transform .15s, background .2s; }
   .theme-btn:active { transform: scale(0.92); }
-
+  .user-chip { display: flex; align-items: center; gap: 10px; }
+  .user-chip .email { font-size: 0.88rem; color: var(--text2); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-chip .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 13px; }
+  .btn-sm { font-size: 0.82rem !important; padding: 8px 12px !important; border-radius: 10px !important; }
   .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 20px 80px; }
   .hero { text-align: center; margin-bottom: 36px; }
-  .hero h1 {
-    font-size: clamp(2.2rem, 6vw, 3.6rem);
-    font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; margin-bottom: 10px;
-  }
+  .hero h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; margin-bottom: 10px; }
   .hero p { color: var(--text2); font-size: clamp(1rem, 2vw, 1.2rem); max-width: 640px; margin: 0 auto; }
-
   .grid { display: grid; gap: 20px; }
   .grid.cols { grid-template-columns: 1.2fr 1fr; }
   @media (max-width: 860px) { .grid.cols { grid-template-columns: 1fr; } }
-
   .card { padding: 24px; }
   .card h2 { font-size: 1.15rem; font-weight: 650; letter-spacing: -0.02em; margin-bottom: 4px; }
   .card .sub { color: var(--text2); font-size: 0.85rem; margin-bottom: 16px; }
-
   .field { margin-bottom: 14px; }
   .field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: -0.01em; }
-  input[type=number], select {
-    width: 100%; padding: 11px 14px; font-size: 1rem; font-family: inherit;
-    color: var(--text); background: var(--input-bg);
-    border: 1px solid var(--input-border); border-radius: 12px; outline: none;
-    transition: border .2s, box-shadow .2s, transform .1s;
-    -webkit-appearance: none; appearance: none;
+  input[type=number], select, input[type=email], input[type=password] {
+    width: 100%; padding: 11px 14px; font-size: 1rem; font-family: inherit; color: var(--text); background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; outline: none; transition: border .2s, box-shadow .2s, transform .1s; -webkit-appearance: none; appearance: none;
   }
-  input[type=number]:focus, select:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
-  }
-  input[type=number]:active, select:active { transform: scale(0.995); }
+  input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); }
+  input:active, select:active { transform: scale(0.995); }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
   @media (max-width: 560px) { .row, .row3 { grid-template-columns: 1fr; } }
-
-  /* Results */
-  .neto-box { text-align: center; padding: 18px; border-radius: 18px; margin-bottom: 16px;
-    background: var(--chip-bg-2); }
+  .neto-box { text-align: center; padding: 18px; border-radius: 18px; margin-bottom: 16px; background: var(--chip-bg-2); }
   .neto-label { color: var(--text2); font-size: 0.85rem; font-weight: 600; }
-  .neto-val { font-size: clamp(2.6rem, 8vw, 3.4rem); font-weight: 700; letter-spacing: -0.04em;
-    color: var(--neto); line-height: 1; transition: color .3s; }
+  .neto-val { font-size: clamp(2.6rem, 8vw, 3.4rem); font-weight: 700; letter-spacing: -0.04em; color: var(--neto); line-height: 1; transition: color .3s; }
   .result-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 2px; border-bottom: 1px solid var(--chip-bg); font-size: 0.92rem; }
   .result-row:last-of-type { border-bottom: 0; }
   .result-row .lbl { color: var(--text2); }
   .result-row .val { font-weight: 600; font-variant-numeric: tabular-nums; }
   .result-row.disc .val { color: #ff453a; }
   .result-row.bono .val { color: var(--accent); }
-
   .actions { display: flex; gap: 10px; margin-top: 18px; }
-  .btn {
-    flex: 1; border: 0; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 0.95rem;
-    padding: 13px; border-radius: 14px; color: #fff; background: var(--accent);
-    transition: transform .15s ease, box-shadow .2s ease, filter .2s;
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  }
+  .btn { flex: 1; border: 0; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 0.95rem; padding: 13px; border-radius: 14px; color: #fff; background: var(--accent); transition: transform .15s ease, box-shadow .2s ease, filter .2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
   .btn:hover { filter: brightness(1.05); box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 35%, transparent); }
   .btn:active { transform: scale(0.97); }
   .btn.secondary { background: var(--chip-bg); color: var(--text); }
   .btn.secondary:hover { box-shadow: none; filter: brightness(0.98); }
   .btn.danger { background: #ff453a; }
   .btn:disabled { opacity: 0.4; pointer-events: none; }
-
-  /* history table */
   .table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
   .table th { text-align: left; color: var(--text2); font-weight: 600; padding: 8px 6px; border-bottom: 1px solid var(--chip-bg); }
   .table td { padding: 8px 6px; border-bottom: 1px solid var(--chip-bg-2); font-variant-numeric: tabular-nums; }
   .table tr:hover td { background: var(--chip-bg-2); }
   .table .del { color: #ff453a; cursor: pointer; background: none; border: 0; font-size: 0.8rem; font-weight: 600; }
   .empty { color: var(--text2); text-align: center; padding: 30px 0; }
-
   .chart-box { margin-top: 20px; }
   .chart-box h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.01em; }
   .chart-holder { position: relative; height: 260px; }
-
-  /* toast */
-  #toast {
-    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--neto); color: var(--bg); padding: 12px 22px; border-radius: 999px;
-    font-weight: 600; font-size: 0.9rem; opacity: 0; pointer-events: none;
-    transition: opacity .3s, transform .3s; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,.2);
-  }
+  #toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--neto); color: var(--bg); padding: 12px 22px; border-radius: 999px; font-weight: 600; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip {
-    padding: 9px 14px; border-radius: 999px; background: var(--chip-bg); border: 1px solid var(--chip-bg);
-    cursor: pointer; font-size: 0.85rem; font-weight: 500; color: var(--text); transition: background .2s, transform .1s;
-  }
+  .chip { padding: 9px 14px; border-radius: 999px; background: var(--chip-bg); border: 1px solid var(--chip-bg); cursor: pointer; font-size: 0.85rem; font-weight: 500; color: var(--text); transition: background .2s, transform .1s; }
   .chip:hover { background: var(--chip-bg-2); }
   .chip:active { transform: scale(0.96); }
   .chip.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
-
   footer { text-align: center; color: var(--text2); font-size: 0.78rem; padding: 30px 0 20px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
-  @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; animation: none !important; }
-  }
+  /* ===== AUTH OVERLAY ===== */
+  .auth-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.5); display: grid; place-items: center; backdrop-filter: blur(6px); opacity: 0; pointer-events: none; transition: opacity .3s; }
+  .auth-overlay.visible { opacity: 1; pointer-events: auto; }
+  .auth-card { background: var(--card); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); border: 1px solid var(--card-border); border-radius: 24px; padding: 32px; width: 90%; max-width: 420px; box-shadow: var(--shadow); }
+  .auth-card h2 { text-align: center; font-size: 1.4rem; margin-bottom: 6px; letter-spacing: -0.02em; }
+  .auth-card .sub { text-align: center; color: var(--text2); font-size: 0.85rem; margin-bottom: 24px; }
+  .auth-tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--chip-bg); border-radius: 999px; padding: 4px; }
+  .auth-tabs button { flex: 1; padding: 9px; border: 0; background: transparent; border-radius: 999px; font-weight: 600; font-size: 0.88rem; color: var(--text2); cursor: pointer; transition: background .2s, color .2s; }
+  .auth-tabs button.active { background: var(--card); color: var(--text); }
+  .auth-card form { display: flex; flex-direction: column; gap: 12px; }
+  .auth-card input { text-align: center; }
+  .auth-card .form-error { color: #ff453a; font-size: 0.82rem; text-align: center; min-height: 1.2em; }
+  .auth-card .link-row { text-align: center; margin-top: 14px; font-size: 0.85rem; color: var(--text2); }
+  .auth-card .link-row button { background: none; border: 0; color: var(--accent); font-weight: 600; cursor: pointer; font-size: 0.85rem; padding: 0; }
+  .auth-status { text-align: center; color: var(--text2); font-size: 0.85rem; margin-top: 8px; }
+  .auth-status .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--chip-bg); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: middle; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .demo-banner { background: var(--chip-bg); color: var(--text2); font-size: 0.8rem; text-align: center; padding: 6px 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+  .demo-banner .dot { width: 7px; height: 7px; border-radius: 50%; background: #34c759; }
 </style>
 </head>
 <body data-theme="light">
@@ -198,6 +131,9 @@
   <nav class="nav-links">
     <a href="#calculadora" class="active">Calculadora</a>
     <a href="#historial">Historial</a>
+    <div id="authArea">
+      <button class="btn btn-sm secondary" id="loginNavBtn">Iniciar sesión</button>
+    </div>
     <button class="theme-btn" id="themeBtn" aria-label="Cambiar tema">☾</button>
   </nav>
 </header>
@@ -209,33 +145,17 @@
   </section>
 
   <section id="calculadora" class="grid cols">
-    <!-- INPUTS -->
     <div class="card glass">
       <h2>Datos</h2>
       <div class="sub">Tus montos se calculan en vivo mientras escribes.</div>
-
       <div class="row">
-        <div class="field">
-          <label>Sueldo bruto mensual (S/)</label>
-          <input type="number" id="bruto" min="0" step="0.01" value="2500" />
-        </div>
-        <div class="field">
-          <label>Días trabajados (1–30)</label>
-          <input type="number" id="dias" min="1" max="30" step="1" value="30" />
-        </div>
+        <div class="field"><label>Sueldo bruto mensual (S/)</label><input type="number" id="bruto" min="0" step="0.01" value="2500" /></div>
+        <div class="field"><label>Días trabajados (1–30)</label><input type="number" id="dias" min="1" max="30" step="1" value="30" /></div>
       </div>
-
       <div class="row">
-        <div class="field">
-          <label>Horas extra del mes</label>
-          <input type="number" id="hextra" min="0" step="0.5" value="0" />
-        </div>
-        <div class="field">
-          <label>Horas por jornada</label>
-          <input type="number" id="jornada" min="1" max="12" step="1" value="8" />
-        </div>
+        <div class="field"><label>Horas extra del mes</label><input type="number" id="hextra" min="0" step="0.5" value="0" /></div>
+        <div class="field"><label>Horas por jornada</label><input type="number" id="jornada" min="1" max="12" step="1" value="8" /></div>
       </div>
-
       <div class="field">
         <label>Turno</label>
         <div class="chips" id="turnoChips">
@@ -244,255 +164,263 @@
           <button class="chip" data-turno="ROTATIVO">Rotativo</button>
         </div>
       </div>
-
       <div class="row">
-        <div class="field">
-          <label>Sistema previsional</label>
-          <select id="sistema">
-            <option value="AFP" selected>AFP</option>
-            <option value="ONP">ONP</option>
-          </select>
-        </div>
-        <div class="field" id="afpField">
-          <label>Tu AFP</label>
-          <select id="afp">
-            <option value="Integra" selected>Integra</option>
-            <option value="Prima">Prima</option>
-            <option value="Profuturo">Profuturo</option>
-            <option value="Habitat">Habitat</option>
-          </select>
-        </div>
+        <div class="field"><label>Sistema previsional</label><select id="sistema"><option value="AFP" selected>AFP</option><option value="ONP">ONP</option></select></div>
+        <div class="field" id="afpField"><label>Tu AFP</label><select id="afp"><option value="Integra" selected>Integra</option><option value="Prima">Prima</option><option value="Profuturo">Profuturo</option><option value="Habitat">Habitat</option></select></div>
       </div>
-
       <div class="row3">
-        <div class="field">
-          <label>Días nocturnos (rotativo)</label>
-          <input type="number" id="diasNoche" min="0" max="30" step="1" value="15" />
-        </div>
-        <div class="field">
-          <label>Tasa bono nocturno %</label>
-          <input type="number" id="bonoTasa" min="0" max="100" step="0.5" value="35" />
-        </div>
-        <div class="field">
-          <label>UIT (S/)</label>
-          <input type="number" id="uit" min="0" step="0.01" value="5600" />
-        </div>
+        <div class="field"><label>Días nocturnos (rotativo)</label><input type="number" id="diasNoche" min="0" max="30" step="1" value="15" /></div>
+        <div class="field"><label>Tasa bono nocturno %</label><input type="number" id="bonoTasa" min="0" max="100" step="0.5" value="35" /></div>
+        <div class="field"><label>UIT (S/)</label><input type="number" id="uit" min="0" step="0.01" value="5600" /></div>
       </div>
     </div>
 
-    <!-- RESULTADOS -->
     <div class="card glass">
       <h2>Resultado</h2>
-      <div class="sub">Mes actual · no guardado</div>
-
-      <div class="neto-box">
-        <div class="neto-label">Sueldo neto</div>
-        <div class="neto-val" id="netoVal">S/ 0.00</div>
-      </div>
-
+      <div class="sub" id="resultSub">Mes actual · no guardado</div>
+      <div class="neto-box"><div class="neto-label">Sueldo neto</div><div class="neto-val" id="netoVal">S/ 0.00</div></div>
       <div class="result-row"><span class="lbl">Remuneración por días</span><span class="val" id="rDias">S/ 0.00</span></div>
       <div class="result-row"><span class="lbl">Horas extra (25% + 35%)</span><span class="val" id="rExtras">S/ 0.00</span></div>
       <div class="result-row bono"><span class="lbl">Bono nocturno</span><span class="val" id="rBono">S/ 0.00</span></div>
       <div class="result-row"><span class="lbl">Remuneración bruta</span><span class="val" id="rBruta">S/ 0.00</span></div>
       <div class="result-row disc"><span class="lbl">Descuento ONP/AFP</span><span class="val" id="rDesc">S/ 0.00</span></div>
       <div class="result-row disc"><span class="lbl">Renta 5ta categoría</span><span class="val" id="rRenta">S/ 0.00</span></div>
-
-      <div class="actions">
-        <button class="btn" id="saveBtn">Guardar este mes</button>
-      </div>
+      <div class="actions"><button class="btn" id="saveBtn">Guardar este mes</button></div>
     </div>
   </section>
 
-  <!-- HISTORIAL -->
   <section id="historial" class="card glass" style="margin-top:20px;">
     <h2>Historial y gráficas</h2>
-    <div class="sub">Guarda cada mes para ver la evolución. Los datos se quedan en tu navegador.</div>
-
-    <div class="table-wrap" id="tableWrap">
-      <div class="empty">Aún no hay meses guardados. Calcula y presiona "Guardar este mes".</div>
-    </div>
-
-    <div class="chart-box">
-      <h3>Sueldo neto mes a mes</h3>
-      <div class="chart-holder"><canvas id="chartNeto"></canvas></div>
-    </div>
-    <div class="chart-box">
-      <h3>Composición: bruto vs. descuentos</h3>
-      <div class="chart-holder"><canvas id="chartComp"></canvas></div>
-    </div>
+    <div class="sub" id="histSub">Guarda cada mes para ver la evolución. Los datos se quedan en tu navegador.</div>
+    <div class="table-wrap" id="tableWrap"><div class="empty">Aún no hay meses guardados. Calcula y presiona "Guardar este mes".</div></div>
+    <div class="chart-box"><h3>Sueldo neto mes a mes</h3><div class="chart-holder"><canvas id="chartNeto"></canvas></div></div>
+    <div class="chart-box"><h3>Composición: bruto vs. descuentos</h3><div class="chart-holder"><canvas id="chartComp"></canvas></div></div>
   </section>
 
   <footer>Valores referenciales · tasas AFP y UIT editables · verifica con tu boleta y SUNAT/SBS.</footer>
 </main>
 
+<!-- ===== AUTH OVERLAY ===== -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <h2>Bienvenido</h2>
+    <div class="sub" id="authSub">Guarda tus datos de forma segura en la nube</div>
+    <div class="auth-tabs" id="authTabs">
+      <button class="active" data-tab="login">Iniciar sesión</button>
+      <button data-tab="signup">Crear cuenta</button>
+    </div>
+    <form id="authForm" novalidate>
+      <input type="email" id="authEmail" placeholder="tu@correo.com" required autocomplete="email" />
+      <input type="password" id="authPass" placeholder="Contraseña (mínimo 6 caracteres)" required autocomplete="current-password" />
+      <button class="btn" type="submit" id="authSubmit">Iniciar sesión</button>
+      <div class="form-error" id="authError"></div>
+    </form>
+    <div class="link-row" id="authLinkRow">
+      ¿No tienes cuenta? <button id="goSignup">Crear una</button>
+    </div>
+    <div class="auth-status" id="authStatus"></div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
-<script>
-/* ============ ESTADO ============ */
+<script type="module">
+/* ================================================================
+   CONFIGURACIÓN FIREBASE — pega aquí tu config cuando tengas el proyecto
+   Deja null para usar modo DEMO (datos locales, sin login).
+   ================================================================ */
+const FIREBASE_CONFIG = null; // ← { apiKey, authDomain, projectId, ... }
+
+/* ================================================================
+   CONSTANTES Y ESTADO
+   ================================================================ */
 const tasasAFP = { Integra: 0.1275, Prima: 0.1280, Profuturo: 0.1280, Habitat: 0.1230 };
 const TASA_ONP = 0.13;
 let turno = "NOCHE";
 let historial = [];
+let mode = "demo"; // "demo" | "cloud"
+let currentUser = null;
+let unsubscribeFirestore = null;
 
-function loadHist() {
-  try { historial = JSON.parse(localStorage.getItem("sueldoHist") || "[]") || []; }
-  catch (e) { historial = []; }
-}
-function saveHist() {
-  localStorage.setItem("sueldoHist", JSON.stringify(historial));
-}
+/* ================================================================
+   FIREBASE (módulos cargados dinámicamente)
+   ================================================================ */
+let firebaseAuth = null, firebaseDb = null;
 
-/* ============ CÁLCULO (misma lógica que el Excel) ============ */
-function calcular() {
-  const bruto = num("bruto");
-  const dias = clamp(num("dias"), 1, 30);
-  const hextra = num("hextra");
-  const jornada = clamp(num("jornada"), 1, 12);
-  const sistema = val("sistema");
-  const afp = val("afp");
-  const diasNoche = clamp(num("diasNoche"), 0, 30);
-  const bonoTasa = num("bonoTasa") / 100;
-  const uit = num("uit");
-
-  const rDias = bruto * (dias / 30);
-  const vHora = (bruto / 30) / jornada;
-  const p25 = Math.min(hextra, 2) * vHora * 1.25;
-  const p35 = Math.max(0, hextra - 2) * vHora * 1.35;
-  const bonoNoches = turno === "DIA" ? 0 : (turno === "NOCHE" ? dias : diasNoche);
-  const rBono = (bruto / 30) * bonoTasa * bonoNoches;
-  const rBruta = rDias + p25 + p35 + rBono;
-  const tasa = sistema === "ONP" ? TASA_ONP : (tasasAFP[afp] ?? 0.125);
-  const rDesc = rBruta * tasa;
-  const rRenta = rentaMensual(rBruta, uit);
-
-  return {
-    bruto, dias, hextra, jornada, sistema, afp, turno, diasNoche,
-    rDias, vHora, p25, p35, rBono, rBruta, rDesc, rRenta,
-    neto: rBruta - rDesc - rRenta
-  };
-}
-
-function rentaMensual(bruta, uit) {
-  const exonerado = 7 * uit;
-  const base = Math.max(0, bruta * 12 - exonerado);
-  const anual = Math.max(0,
-    base * 0.08
-    - Math.max(0, base - 5 * uit) * 0.06
-    - Math.max(0, base - 20 * uit) * 0.03
-    - Math.max(0, base - 35 * uit) * 0.03
-    - Math.max(0, base - 45 * uit) * 0.10
-  );
-  return anual / 12;
-}
-
-/* ============ FORMATO Y ANIMACIÓN DE NÚMEROS ============ */
-const fmt = (n) => "S/ " + n.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-let animId = null;
-function animateValue(el, target) {
-  const start = parseFloat((el.dataset.v || "0").replace(/[^0-9.-]/g, "")) || 0;
-  el.dataset.v = target;
-  cancelAnimationFrame(animId);
-  const t0 = performance.now();
-  const dur = 350;
-  function step(t) {
-    const p = Math.min(1, (t - t0) / dur);
-    const e = 1 - Math.pow(1 - p, 3);
-    el.textContent = fmt(start + (target - start) * e);
-    if (p < 1) animId = requestAnimationFrame(step);
+async function initFirebase() {
+  if (!FIREBASE_CONFIG || !FIREBASE_CONFIG.apiKey) return false;
+  try {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    const { getAuth, setPersistence, browserLocalPersistence, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+    const { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, query, orderBy } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    const app = initializeApp(FIREBASE_CONFIG);
+    firebaseAuth = getAuth(app);
+    await setPersistence(firebaseAuth, browserLocalPersistence);
+    firebaseDb = getFirestore(app);
+    // Auth state listener
+    onAuthStateChanged(firebaseAuth, (user) => {
+      currentUser = user;
+      if (user) {
+        hideAuth();
+        if (mode === "cloud" && !unsubscribeFirestore) connectFirestore(user.uid);
+      } else {
+        if (mode === "cloud") showAuth();
+      }
+    });
+    return true;
+  } catch (e) {
+    console.warn("Firebase no disponible, modo demo:", e);
+    return false;
   }
-  animId = requestAnimationFrame(step);
 }
 
-/* ============ RENDER EN VIVO ============ */
-function render() {
-  const c = calcular();
-  animateValue(document.getElementById("netoVal"), c.neto);
-  setText("rDias", fmt(c.rDias));
-  setText("rExtras", fmt(c.p25 + c.p35));
-  setText("rBono", fmt(c.rBono));
-  setText("rBruta", fmt(c.rBruta));
-  setText("rDesc", fmt(c.rDesc));
-  setText("rRenta", fmt(c.rRenta));
-  return c;
+async function doLogin(email, pass) {
+  if (!firebaseAuth) throw new Error("Firebase no inicializado");
+  await signInWithEmailAndPassword(firebaseAuth, email, pass);
 }
+async function doSignup(email, pass) {
+  if (!firebaseAuth) throw new Error("Firebase no inicializado");
+  await createUserWithEmailAndPassword(firebaseAuth, email, pass);
+}
+async function doLogout() {
+  if (!firebaseAuth) throw new Error("Firebase no inicializado");
+  await signOut(firebaseAuth);
+}
+
+/* ================================================================
+   DATA LAYER: demo (localStorage) vs cloud (Firestore)
+   ================================================================ */
+function loadHistDemo() { try { historial = JSON.parse(localStorage.getItem("sueldoHist") || "[]") || []; } catch (e) { historial = []; } }
+function saveHistDemo() { localStorage.setItem("sueldoHist", JSON.stringify(historial)); }
+
+async function loadHistCloud(uid) {
+  const ref = collection(firebaseDb, "users", uid, "months");
+  const q = query(ref, orderBy("clave"));
+  const snap = await getDocs(q);
+  historial = snap.docs.map(d => ({ clave: d.id, ...d.data() }));
+}
+
+function connectFirestore(uid) {
+  const ref = collection(firebaseDb, "users", uid, "months");
+  unsubscribeFirestore = onSnapshot(ref, (snap) => {
+    historial = snap.docs.map(d => ({ clave: d.id, ...d.data() }));
+    historial.sort((a, b) => a.clave.localeCompare(b.clave));
+    renderAll();
+  }, (err) => {
+    console.warn("Firestore listener error:", err);
+    toast("Error al sincronizar datos en la nube.");
+  });
+}
+
+async function saveMonthCloud(uid, record) {
+  const ref = doc(collection(firebaseDb, "users", uid, "months"), record.clave);
+  await setDoc(ref, record, { merge: true });
+}
+async function deleteMonthCloud(uid, clave) {
+  await deleteDoc(doc(collection(firebaseDb, "users", uid, "months"), clave));
+}
+
+async function migrateLocalToCloud(uid) {
+  const local = [];
+  try { local = JSON.parse(localStorage.getItem("sueldoHist") || "[]") || []; } catch (e) {}
+  if (!local.length) return 0;
+  const col = collection(firebaseDb, "users", uid, "months");
+  const batch = [];
+  for (const rec of local) {
+    batch.push(setDoc(doc(col, rec.clave), rec, { merge: true }));
+  }
+  await Promise.all(batch);
+  localStorage.setItem("sueldoMigrated_" + uid, "1");
+  return local.length;
+}
+
+/* Unified data functions (respect mode) */
+async function loadHist() {
+  if (mode === "cloud" && currentUser) await loadHistCloud(currentUser.uid);
+  else loadHistDemo();
+}
+async function saveHist() {
+  if (mode === "cloud" && currentUser) {
+    const c = calcular(); const now = new Date();
+    const record = { clave: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`, anio: now.getFullYear(), mes: now.getMonth()+1, ...c };
+    historial = historial.filter(h => h.clave !== record.clave);
+    historial.push(record); historial.sort((a,b) => a.clave.localeCompare(b.clave));
+    await saveMonthCloud(currentUser.uid, record);
+  } else saveHistDemo();
+}
+async function deleteHistRecord(clave) {
+  if (mode === "cloud" && currentUser) await deleteMonthCloud(currentUser.uid, clave);
+  historial = historial.filter(h => h.clave !== clave);
+  if (mode === "demo") saveHistDemo();
+}
+
+/* ================================================================
+   CÁLCULO (misma lógica)
+   ================================================================ */
+function calcular() {
+  const bruto = num("bruto"); const dias = clamp(num("dias"), 1, 30); const hextra = num("hextra"); const jornada = clamp(num("jornada"), 1, 12); const sistema = val("sistema"); const afp = val("afp"); const diasNoche = clamp(num("diasNoche"), 0, 30); const bonoTasa = num("bonoTasa") / 100; const uit = num("uit");
+  const rDias = bruto * (dias / 30); const vHora = (bruto / 30) / jornada; const p25 = Math.min(hextra, 2) * vHora * 1.25; const p35 = Math.max(0, hextra - 2) * vHora * 1.35; const bonoNoches = turno === "DIA" ? 0 : (turno === "NOCHE" ? dias : diasNoche); const rBono = (bruto / 30) * bonoTasa * bonoNoches; const rBruta = rDias + p25 + p35 + rBono; const tasa = sistema === "ONP" ? TASA_ONP : (tasasAFP[afp] ?? 0.125); const rDesc = rBruta * tasa; const rRenta = rentaMensual(rBruta, uit);
+  return { bruto, dias, hextra, jornada, sistema, afp, turno, diasNoche, rDias, vHora, p25, p35, rBono, rBruta, rDesc, rRenta, neto: rBruta - rDesc - rRenta };
+}
+function rentaMensual(bruta, uit) { const exonerado = 7 * uit; const base = Math.max(0, bruta * 12 - exonerado); const anual = Math.max(0, base * 0.08 - Math.max(0, base - 5*uit)*0.06 - Math.max(0, base - 20*uit)*0.03 - Math.max(0, base - 35*uit)*0.03 - Math.max(0, base - 45*uit)*0.10); return anual / 12; }
+
+/* ================================================================
+   FORMATO / ANIMACIÓN / RENDER
+   ================================================================ */
+const fmt = (n) => "S/ " + n.toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+let animId = null;
+function animateValue(el, target) { const start = parseFloat((el.dataset.v || "0").replace(/[^0-9.-]/g, "")) || 0; el.dataset.v = target; cancelAnimationFrame(animId); const t0 = performance.now(); const dur = 350; function step(t) { const p = Math.min(1, (t - t0)/dur); const e = 1 - Math.pow(1-p,3); el.textContent = fmt(start + (target-start)*e); if (p<1) animId = requestAnimationFrame(step); } animId = requestAnimationFrame(step); }
+function render() { const c = calcular(); animateValue(document.getElementById("netoVal"), c.neto); setText("rDias", fmt(c.rDias)); setText("rExtras", fmt(c.p25+c.p35)); setText("rBono", fmt(c.rBono)); setText("rBruta", fmt(c.rBruta)); setText("rDesc", fmt(c.rDesc)); setText("rRenta", fmt(c.rRenta)); return c; }
 function setText(id, t) { document.getElementById(id).textContent = t; }
-
-/* ============ INPUT HELPERS ============ */
 const num = (id) => { const v = parseFloat(document.getElementById(id).value); return isNaN(v) ? 0 : v; };
 const val = (id) => document.getElementById(id).value;
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
-document.querySelectorAll("input, select").forEach(el => {
-  el.addEventListener("input", render);
-  el.addEventListener("change", render);
-});
+/* ================================================================
+   AUTH UI
+   ================================================================ */
+const authOverlay = document.getElementById("authOverlay");
+const authForm = document.getElementById("authForm");
+const authEmail = document.getElementById("authEmail");
+const authPass = document.getElementById("authPass");
+const authSubmit = document.getElementById("authSubmit");
+const authError = document.getElementById("authError");
+const authStatus = document.getElementById("authStatus");
+const authArea = document.getElementById("authArea");
+const loginNavBtn = document.getElementById("loginNavBtn");
+const authTabs = document.getElementById("authTabs");
+const authLinkRow = document.getElementById("authLinkRow");
 
-/* Turno chips */
-document.querySelectorAll("#turnoChips .chip").forEach(chip => {
-  chip.addEventListener("click", () => {
-    document.querySelectorAll("#turnoChips .chip").forEach(c => c.classList.remove("selected"));
-    chip.classList.add("selected");
-    turno = chip.dataset.turno;
-    render();
-  });
-});
+function showAuth() { authOverlay.classList.add("visible"); authEmail.value = ""; authPass.value = ""; authError.textContent = ""; }
+function hideAuth() { authOverlay.classList.remove("visible"); }
+function setAuthTab(tab) { authTabs.querySelectorAll("button").forEach(b => b.classList.toggle("active", b.dataset.tab === tab)); authForm.querySelector("input[type=password]").type = tab === "login" ? "password" : "password"; authSubmit.textContent = tab === "login" ? "Iniciar sesión" : "Crear cuenta"; authLinkRow.innerHTML = tab === "login" ? '¿No tienes cuenta? <button id="goSignup">Crear una</button>' : 'Ya tienes cuenta? <button id="goLogin">Iniciar sesión</button>'; }
+authTabs.querySelectorAll("button").forEach(b => b.addEventListener("click", () => setAuthTab(b.dataset.tab)));
+authLinkRow.addEventListener("click", (e) => { if (e.target.id === "goSignup") setAuthTab("signup"); if (e.target.id === "goLogin") setAuthTab("login"); });
+authForm.addEventListener("submit", async (e) => { e.preventDefault(); authError.textContent = ""; authSubmit.disabled = true; authStatus.innerHTML = '<span class="spinner"></span> Procesando...'; try { if (authSubmit.textContent.trim().includes("Crear")) await doSignup(authEmail.value.trim(), authPass.value); else await doLogin(authEmail.value.trim(), authPass.value); toast("Sesión iniciada ✓"); } catch (err) { authError.textContent = err.message || "Error de autenticación"; } finally { authSubmit.disabled = false; authStatus.innerHTML = ""; } });
+loginNavBtn.addEventListener("click", () => { if (mode === "cloud" && !currentUser) showAuth(); });
 
-/* Sistema ONP/AFP -> show/hide AFP */
-document.getElementById("sistema").addEventListener("change", (e) => {
-  document.getElementById("afpField").style.opacity = e.target.value === "AFP" ? "1" : "0.4";
-});
+async function handleLogout() { await doLogout(); currentUser = null; unsubscribeFirestore = null; historial = []; mode = "demo"; saveHistDemo(); renderAll(); authArea.innerHTML = '<button class="btn btn-sm secondary" id="loginNavBtn">Iniciar sesión</button>'; document.getElementById("loginNavBtn")?.addEventListener("click", () => showAuth()); authArea.querySelector("#loginNavBtn")?.addEventListener("click", () => showAuth()); toast("Cerraste sesión"); }
 
-/* ============ GUARDAR MES ============ */
-const mesInputs = [
-  { v: () => new Date().getFullYear(), t: "año" },
-  { v: () => new Date().getMonth() + 1, t: "mes" },
-];
-function guardarMes() {
-  const c = render();
-  const now = new Date();
-  const anio = now.getFullYear(), mes = now.getMonth() + 1;
-  const clave = `${anio}-${String(mes).padStart(2, "0")}`;
-  if (historial.some(h => h.clave === clave)) {
-    toast("Este mes ya está guardado. Bórralo para re-guardarlo.");
-    return;
-  }
-  historial.push({ clave, anio, mes, ...c });
-  historial.sort((a, b) => a.clave.localeCompare(b.clave));
-  saveHist();
-  renderHistorial();
-  toast("Mes guardado ✓");
-}
-document.getElementById("saveBtn").addEventListener("click", guardarMes);
+/* ================================================================
+   GUARDAR / BORRAR MES
+   ================================================================ */
+function guardarMes() { render(); const now = new Date(); const anio = now.getFullYear(), mes = now.getMonth()+1; const clave = `${anio}-${String(mes).padStart(2,"0")}`; if (historial.some(h => h.clave === clave)) { toast("Este mes ya está guardado. Bórralo para re-guardarlo."); return; } const c = calcular(); const record = { clave, anio, mes, ...c }; historial.push(record); historial.sort((a,b) => a.clave.localeCompare(b.clave)); saveHist().then(() => { renderHistorial(); toast("Mes guardado ✓"); }).catch(() => toast("Error al guardar")); }
+document.getElementById("saveBtn")?.addEventListener("click", guardarMes);
 
-function borrarMes(clave) {
-  historial = historial.filter(h => h.clave !== clave);
-  saveHist();
-  renderHistorial();
-  toast("Mes eliminado");
-}
+async function borrarMes(clave) { await deleteHistRecord(clave); renderHistorial(); toast("Mes eliminado"); }
 
-/* ============ HISTORIAL + TABLA ============ */
+/* ================================================================
+   HISTORIAL + TABLA
+   ================================================================ */
+function renderAll() { render(); renderHistorial(); }
 function renderHistorial() {
   const wrap = document.getElementById("tableWrap");
-  if (historial.length === 0) {
-    wrap.innerHTML = '<div class="empty">Aún no hay meses guardados.</div>';
-    drawCharts();
-    return;
-  }
+  const sub = document.getElementById("histSub");
+  if (historial.length === 0) { wrap.innerHTML = '<div class="empty">Aún no hay meses guardados.</div>'; drawCharts(); return; }
   const meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
-  let html = `<table class="table"><thead><tr>
-    <th>Mes</th><th>Bruto</th><th>Bono</th><th>Descuento</th><th>Neto</th><th></th>
-  </tr></thead><tbody>`;
+  let html = `<table class="table"><thead><tr><th>Mes</th><th>Bruto</th><th>Bono</th><th>Descuento</th><th>Neto</th><th></th></tr></thead><tbody>`;
   [...historial].reverse().forEach(h => {
-    html += `<tr>
-      <td><strong>${meses[h.mes-1]} ${h.anio}</strong></td>
-      <td>${fmt(h.rBruta)}</td>
-      <td>${fmt(h.rBono)}</td>
-      <td>${fmt(h.rDesc + h.rRenta)}</td>
-      <td><strong>${fmt(h.neto)}</strong></td>
-      <td><button class="del" data-clave="${h.clave}">Borrar</button></td>
-    </tr>`;
+    html += `<tr><td><strong>${meses[h.mes-1]} ${h.anio}</strong></td><td>${fmt(h.rBruta)}</td><td>${fmt(h.rBono)}</td><td>${fmt(h.rDesc+h.rRenta)}</td><td><strong>${fmt(h.neto)}</strong></td><td><button class="del" data-clave="${h.clave}">Borrar</button></td></tr>`;
   });
   html += "</tbody></table>";
   wrap.innerHTML = html;
@@ -500,97 +428,69 @@ function renderHistorial() {
   drawCharts();
 }
 
-/* ============ GRÁFICAS ============ */
+/* ================================================================
+   GRÁFICAS
+   ================================================================ */
 let chartNeto = null, chartComp = null;
 const meses = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
-
-function chartColors() {
-  const dark = document.body.dataset.theme === "dark";
-  return {
-    text: dark ? "#a1a1a6" : "#6e6e73",
-    grid: dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
-  };
-}
-
+function chartColors() { const dark = document.body.dataset.theme === "dark"; return { text: dark ? "#a1a1a6" : "#6e6e73", grid: dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)" }; }
 function drawCharts() {
-  const cc = chartColors();
-  const labels = historial.map(h => `${meses[h.mes-1]} ${h.anio}`);
-  const netos = historial.map(h => h.neto);
-  const brutos = historial.map(h => h.rBruta);
-  const desc = historial.map(h => h.rDesc + h.rRenta);
-  const bonos = historial.map(h => h.rBono);
-
+  const cc = chartColors(); const labels = historial.map(h => `${meses[h.mes-1]} ${h.anio}`); const netos = historial.map(h => h.neto); const brutos = historial.map(h => h.rBruta); const desc = historial.map(h => h.rDesc+h.rRenta); const bonos = historial.map(h => h.rBono);
   const common = { labels, responsive: true, maintainAspectRatio: false };
-
-  if (chartNeto) chartNeto.destroy();
-  if (chartComp) chartComp.destroy();
-
-  chartNeto = new Chart(document.getElementById("chartNeto"), {
-    type: "line",
-    data: { labels, datasets: [{
-      label: "Sueldo neto", data: netos,
-      borderColor: "#0a84ff", backgroundColor: "rgba(10,132,255,0.12)",
-      fill: true, tension: 0.4, pointBackgroundColor: "#0a84ff", borderWidth: 3,
-    }]},
-    options: {
-      ...common,
-      animation: { duration: 500 },
-      plugins: { legend: { display: false } },
-      scales: { y: { ticks: { color: cc.text }, grid: { color: cc.grid } }, x: { ticks: { color: cc.text } } },
-    }
-  });
-
-  chartComp = new Chart(document.getElementById("chartComp"), {
-    type: "bar",
-    data: { labels, datasets: [
-      { label: "Bruto", data: brutos, backgroundColor: "#0a84ff", borderRadius: 6 },
-      { label: "Bono nocturno", data: bonos, backgroundColor: "#5e5ce6", borderRadius: 6 },
-      { label: "Descuentos", data: desc, backgroundColor: "#ff453a", borderRadius: 6 },
-    ]},
-    options: {
-      ...common,
-      animation: { duration: 500 },
-      plugins: { legend: { labels: { color: cc.text, usePointStyle: true } } },
-      scales: {
-        y: { stacked: false, ticks: { color: cc.text }, grid: { color: cc.grid } },
-        x: { stacked: false, ticks: { color: cc.text } },
-      }
-    }
-  });
+  if (chartNeto) chartNeto.destroy(); if (chartComp) chartComp.destroy();
+  chartNeto = new Chart(document.getElementById("chartNeto"), { type:"line", data:{ labels, datasets:[{ label:"Sueldo neto", data:netos, borderColor:"#0a84ff", backgroundColor:"rgba(10,132,255,0.12)", fill:true, tension:0.4, pointBackgroundColor:"#0a84ff", borderWidth:3 }]}, options:{...common, animation:{duration:500}, plugins:{legend:{display:false}}, scales:{y:{ticks:{color:cc.text}, grid:{color:cc.grid}}, x:{ticks:{color:cc.text}}} }});
+  chartComp = new Chart(document.getElementById("chartComp"), { type:"bar", data:{ labels, datasets:[{ label:"Bruto", data:brutos, backgroundColor:"#0a84ff", borderRadius:6 },{ label:"Bono nocturno", data:bonos, backgroundColor:"#5e5ce6", borderRadius:6 },{ label:"Descuentos", data:desc, backgroundColor:"#ff453a", borderRadius:6 }]}, options:{...common, animation:{duration:500}, plugins:{legend:{labels:{color:cc.text, usePointStyle:true}}}, scales:{y:{ticks:{color:cc.text}, grid:{color:cc.grid}}, x:{ticks:{color:cc.text}}} }});
 }
 
-/* ============ TOAST ============ */
+/* ================================================================
+   TOAST / TEMA
+   ================================================================ */
 let toastTimer = null;
-function toast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
-}
+function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2200); }
+function applyTheme(t) { document.body.dataset.theme = t; document.getElementById("themeBtn").textContent = t === "dark" ? "☀" : "☾"; if (chartNeto||chartComp) drawCharts(); }
+document.getElementById("themeBtn")?.addEventListener("click", () => { const next = document.body.dataset.theme === "dark" ? "light" : "dark"; localStorage.setItem("sueldoTheme", next); applyTheme(next); });
 
-/* ============ TEMA ============ */
-const themeBtn = document.getElementById("themeBtn");
-function applyTheme(t) {
-  document.body.dataset.theme = t;
-  themeBtn.textContent = t === "dark" ? "☀" : "☾";
-  if (chartNeto || chartComp) drawCharts();
-}
-themeBtn.addEventListener("click", () => {
-  const next = document.body.dataset.theme === "dark" ? "light" : "dark";
-  localStorage.setItem("sueldoTheme", next);
-  applyTheme(next);
-});
-(function initTheme() {
+/* ================================================================
+   TURNOS, INPUTS, ONP/AFP
+   ================================================================ */
+document.querySelectorAll("#turnoChips .chip").forEach(chip => { chip.addEventListener("click", () => { document.querySelectorAll("#turnoChips .chip").forEach(c => c.classList.remove("selected")); chip.classList.add("selected"); turno = chip.dataset.turno; render(); }); });
+document.getElementById("sistema")?.addEventListener("change", (e) => { document.getElementById("afpField").style.opacity = e.target.value === "AFP" ? "1" : "0.4"; });
+document.querySelectorAll("input, select").forEach(el => { el.addEventListener("input", render); el.addEventListener("change", render); });
+
+/* ================================================================
+   INICIO
+   ================================================================ */
+(async function init() {
+  /* Tema */
   const saved = localStorage.getItem("sueldoTheme");
   const sys = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   applyTheme(saved || sys);
-})();
 
-/* ============ INIT ============ */
-loadHist();
-render();
-renderHistorial();
+  /* Determinar modo */
+  if (FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey) {
+    mode = "cloud";
+    const ok = await initFirebase();
+    if (!ok) { mode = "demo"; }
+  }
+
+  if (mode === "cloud") {
+    authArea.innerHTML = '<button class="btn btn-sm secondary" id="logoutBtn">Cerrar sesión</button>';
+    document.getElementById("logoutBtn")?.addEventListener("click", handleLogout);
+    /* Si ya hay sesión activa, hideAuth() se llama desde onAuthStateChanged; si no, showAuth() */
+    if (!currentUser) showAuth();
+    document.getElementById("resultSub").textContent = "Modo seguro — datos en la nube";
+    document.getElementById("histSub").textContent = "Datos en la nube · solo tú accedes a los tuyos";
+    authOverlay.classList.remove("visible"); // si authed, no muestra overlay
+  } else {
+    /* Demo mode — app visible sin login, banner informativo */
+    document.getElementById("resultSub").textContent = "Modo demo · datos locales";
+    document.getElementById("histSub").textContent = "Los datos se guardan solo en tu navegador. Para seguridad en la nube, configura Firebase.";
+    loadHist(); renderAll();
+  }
+
+  /* Botón guardar mes (demo) */
+  document.getElementById("saveBtn")?.addEventListener("click", guardarMes);
+})();
 </script>
 </body>
 </html>
