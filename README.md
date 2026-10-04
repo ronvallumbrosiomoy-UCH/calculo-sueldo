@@ -12,6 +12,8 @@ Página web (estática) para calcular el **sueldo neto** en Perú y guardar el *
 - **Historial**: guarda cada mes en tu navegador (localStorage).
 - **Gráficas**: sueldo neto mes a mes y composición bruto/bono/descuentos (Chart.js).
 - **Modo claro/oscuro** automático y manual.
+- **Modo invitado**: prueba la calculadora sin cuenta y sin guardar nada.
+- **Cerrar sesión**: botón en la barra superior; tus datos quedan protegidos por RLS.
 - **Accesible**: respeta `prefers-reduced-motion` y el tamaño de texto del sistema.
 
 ## Cómo usarla

@@ -545,9 +545,9 @@ async function cargarHistorial() {
   if (error || !data) { wrap.innerHTML='<div class="empty">Sin datos guardados.</div>'; drawCharts(); return; }
   hist = data;
   const meses=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
-  let html=`<table class="table"><thead><tr><th>Mes</th><th>Bruto</th><th>Bono</th><th>Descuento</th><th>Neto</th><th></th></tr></thead><tbody>`;
+  let html=`<table class="table"><thead><tr><th>Mes</th><th>Bruto</th><th>Bono</th><th>HE 25%</th><th>HE 35%</th><th>Descuento</th><th>Neto</th><th></th></tr></thead><tbody>`;
   [...data].reverse().forEach(h=>{
-    html+=`<tr><td><strong>${meses[h.mes-1]} ${h.anio}</strong></td><td>${fmt(h.sueldo_bruto)}</td><td>${fmt(h.bono_nocturno)}</td><td>${fmt(h.descuento_prev+h.renta_5ta)}</td><td><strong>${fmt(h.sueldo_neto)}</strong></td><td><button class="del" data-id="${h.id}">Borrar</button></td></tr>`;
+    html+=`<tr><td><strong>${meses[h.mes-1]} ${h.anio}</strong></td><td>${fmt(h.sueldo_bruto)}</td><td>${fmt(h.bono_nocturno)}</td><td>${(h.horas_extra_25 ?? 0)}h</td><td>${(h.horas_extra_35 ?? 0)}h</td><td>${fmt(h.descuento_prev+h.renta_5ta)}</td><td><strong>${fmt(h.sueldo_neto)}</strong></td><td><button class="del" data-id="${h.id}">Borrar</button></td></tr>`;
   });
   html+="</tbody></table>";
   wrap.innerHTML=html;
