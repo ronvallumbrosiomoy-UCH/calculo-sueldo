@@ -285,15 +285,9 @@
             <input type="number" id="diasNoche" min="0" max="30" step="1" value="15" />
           </div>
         </div>
-        <div class="row">
-          <div class="field">
-            <label>Días de descanso trabajados</label>
-            <input type="number" id="diasDescanso" min="0" max="30" step="1" value="0" />
-          </div>
-          <div class="field">
-            <label>Recargo por descanso %</label>
-            <input type="number" id="descansoTasa" min="0" max="100" step="0.5" value="100" />
-          </div>
+        <div class="field">
+          <label>Días de descanso trabajados</label>
+          <input type="number" id="diasDescanso" min="0" max="30" step="1" value="0" />
         </div>
         <p style="font-size:0.78rem; color:var(--text2); margin:2px 0 14px;">Un día de descanso trabajado paga el día + 100% de recargo. Las horas que excedan tu jornada (ej. 11h con turno de 8h) se cargan como horas extra (2h al 25%, de la 3ª al 35%) y se acumulan al recargo.</p>
         <div class="field">
@@ -322,15 +316,9 @@
             </select>
           </div>
         </div>
-        <div class="row3">
-          <div class="field">
-            <label>Tasa bono nocturno %</label>
-            <input type="number" id="bonoTasa" min="0" max="100" step="0.5" value="35" />
-          </div>
-          <div class="field">
-            <label>UIT (S/)</label>
-            <input type="number" id="uit" min="0" step="0.01" value="5600" />
-          </div>
+        <div class="field">
+          <label>UIT (S/)</label>
+          <input type="number" id="uit" min="0" step="0.01" value="5600" />
         </div>
       </div>
 
@@ -416,8 +404,6 @@ function calcular() {
   const afp = val("afp");
   const diasNoche = clamp(num("diasNoche"), 0, 30);
   const diasDescanso = clamp(num("diasDescanso"), 0, 30);
-  const descansoTasa = num("descansoTasa") / 100;
-  const bonoTasa = num("bonoTasa") / 100;
   const uit = num("uit");
   const rDias = bruto * (dias / 30);
   const vHora = (bruto / 30) / jornada;
@@ -425,14 +411,14 @@ function calcular() {
   const p35 = hextra35 * vHora * 1.35;
   const hextra = hextra25 + hextra35;
   const bonoNoches = turno === "DIA" ? 0 : (turno === "NOCHE" ? dias : diasNoche);
-  const rBono = (bruto / 30) * bonoTasa * bonoNoches;
-  const rDescanso = diasDescanso * (bruto / 30) * descansoTasa;
+  const rBono = (bruto / 30) * 0.35 * bonoNoches;
+  const rDescanso = diasDescanso * (bruto / 30);
   const rBruta = rDias + p25 + p35 + rBono + rDescanso;
   const tasa = sistema === "ONP" ? TASA_ONP : (tasasAFP[afp] ?? 0.125);
   const rDesc = rBruta * tasa;
   const rRenta = rentaMensual(rBruta, uit);
   return { bruto, dias, hextra, hextra25, hextra35, jornada, sistema, afp, turno, diasNoche,
-    diasDescanso, descansoTasa, rDias, vHora, p25, p35, rBono, rDescanso, rBruta, rDesc, rRenta,
+    diasDescanso, rDias, vHora, p25, p35, rBono, rDescanso, rBruta, rDesc, rRenta,
     neto: rBruta - rDesc - rRenta };
 }
 function rentaMensual(bruta, uit) {
@@ -502,7 +488,7 @@ async function guardarMes() {
     usuario_id: profile.id, mes, anio,
     sueldo_bruto: c.bruto, dias_trabajados: c.dias, horas_extra: c.hextra,
     horas_extra_25: c.hextra25, horas_extra_35: c.hextra35,
-    tipo_turno: c.turno, dias_noche: c.diasNoche, tasa_bono: c.bonoTasa,
+    tipo_turno: c.turno, dias_noche: c.diasNoche, tasa_bono: 35,
     dias_descanso: c.diasDescanso, recargo_descanso: c.rDescanso,
     sistema_prev: c.sistema, afp: c.afp, bono_nocturno: c.rBono,
     remuneracion_bruta: c.rBruta, descuento_prev: c.rDesc,
@@ -531,7 +517,7 @@ async function exportarPDF(c) {
       <tr style="background:#fafafa;"><td style="padding:6px 8px;">Sistema previsional</td><td style="text-align:right; padding:6px 8px;">${c.sistema}</td></tr>
       <tr><td style="padding:6px 8px;">Bono nocturno</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rBono)}</td></tr>
       <tr style="background:#fafafa;"><td style="padding:6px 8px;">Días de descanso trabajados</td><td style="text-align:right; padding:6px 8px;">${c.diasDescanso}</td></tr>
-      <tr><td style="padding:6px 8px;">Recargo por descanso (${c.descansoTasa*100}%)</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rDescanso)}</td></tr>
+      <tr><td style="padding:6px 8px;">Recargo por descanso (100%)</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rDescanso)}</td></tr>
       <tr style="background:#fafafa;"><td style="padding:6px 8px;">Remuneración bruta</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rBruta)}</td></tr>
       <tr><td style="padding:6px 8px;">Descuento ONP/AFP</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rDesc)}</td></tr>
       <tr style="background:#fafafa;"><td style="padding:6px 8px;">Renta 5ta categoría</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rRenta)}</td></tr>

@@ -7,9 +7,10 @@ Página web (estática) para calcular el **sueldo neto** en Perú y guardar el *
 - **Cálculo en vivo**: el sueldo neto se actualiza mientras escribes (animación de conteo).
 - **Sistema previsional**: ONP (13%) o AFP con desplegable (Integra, Prima, Profuturo, Habitat). Las tasas AFP son editables en el código.
 - **Horas extra**: campos separados para horas al 25% y horas al 35%.
+- **Descansos trabajados**: recargo fijo del 100% por cada día de descanso trabajado.
 - **Bono nocturno**: +35% según turno (Día / Noche / Rotativo).
 - **Renta de 5ª categoría**: tramos progresivos con UIT editable.
-- **Historial**: guarda cada mes en tu navegador (localStorage).
+- **Historial**: guarda cada mes en Supabase (con RLS, solo tú ves tus datos).
 - **Gráficas**: sueldo neto mes a mes y composición bruto/bono/descuentos (Chart.js).
 - **Modo claro/oscuro** automático y manual.
 - **Modo invitado**: prueba la calculadora sin cuenta y sin guardar nada.
