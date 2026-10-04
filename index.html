@@ -78,7 +78,7 @@
     background: linear-gradient(135deg, var(--accent), #5e5ce6);
     display: grid; place-items: center; color: #fff; font-size: 15px; font-weight: 700;
   }
-  .nav-links { display: flex; gap: 8px; align-items: center; }
+  .nav-links { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
   .nav-links a {
     color: var(--text2); text-decoration: none; font-size: 14px; font-weight: 500;
     padding: 7px 12px; border-radius: 999px; transition: color .2s, background .2s;
@@ -101,6 +101,15 @@
     transition: background .2s;
   }
   .btn-logout:hover { background: rgba(255,69,58,0.15); color: #ff453a; }
+  .user-area { display: flex; gap: 8px; align-items: center; }
+  .btn-guest {
+    margin-top: 14px; padding: 12px 26px; border-radius: 14px; cursor: pointer;
+    background: transparent; color: var(--text2); border: 1px solid var(--input-border);
+    font-weight: 600; font-size: 0.95rem; font-family: inherit;
+    transition: background .2s, color .2s, transform .1s;
+  }
+  .btn-guest:hover { background: var(--chip-bg); color: var(--text); }
+  .btn-guest:active { transform: scale(0.97); }
 
   .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 20px 80px; }
   .hero { text-align: center; margin-bottom: 36px; }
@@ -213,6 +222,10 @@
   <nav class="nav-links">
     <a href="#calculadora">Calculadora</a>
     <a href="#historial">Historial</a>
+    <div class="user-area" id="userArea" style="display:none;">
+      <span class="user-badge" id="userBadge">Invitado</span>
+      <button class="btn-logout" id="logoutBtn">Cerrar sesión</button>
+    </div>
     <button class="theme-btn" id="themeBtn" aria-label="Cambiar tema">☾</button>
   </nav>
 </header>
@@ -226,7 +239,8 @@
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
       Iniciar sesión con GitHub
     </button>
-    <p style="margin-top:16px; font-size:0.8rem;">Solo tú puedes ver tus datos. Tu sueldo y tus registros están protegidos por RLS en la base de datos.</p>
+    <button class="btn-guest" id="btnGuest">Probar como invitado</button>
+    <p style="margin-top:16px; font-size:0.8rem;">Modo invitado: la calculadora funciona sin guardar nada. Inicia sesión para guardar tu historial, protegido por RLS en la base de datos.</p>
   </section>
 
   <!-- MAIN APP (visible solo si ha iniciado sesión) -->
@@ -253,12 +267,22 @@
         </div>
         <div class="row">
           <div class="field">
-            <label>Horas extra del mes</label>
-            <input type="number" id="hextra" min="0" step="0.5" value="0" />
+            <label>Horas extra al 25%</label>
+            <input type="number" id="hextra25" min="0" step="0.5" value="0" />
           </div>
+          <div class="field">
+            <label>Horas extra al 35%</label>
+            <input type="number" id="hextra35" min="0" step="0.5" value="0" />
+          </div>
+        </div>
+        <div class="row">
           <div class="field">
             <label>Horas por jornada</label>
             <input type="number" id="jornada" min="1" max="12" step="1" value="8" />
+          </div>
+          <div class="field">
+            <label>Días nocturnos (rotativo)</label>
+            <input type="number" id="diasNoche" min="0" max="30" step="1" value="15" />
           </div>
         </div>
         <div class="field">
@@ -289,10 +313,6 @@
         </div>
         <div class="row3">
           <div class="field">
-            <label>Días nocturnos (rotativo)</label>
-            <input type="number" id="diasNoche" min="0" max="30" step="1" value="15" />
-          </div>
-          <div class="field">
             <label>Tasa bono nocturno %</label>
             <input type="number" id="bonoTasa" min="0" max="100" step="0.5" value="35" />
           </div>
@@ -312,7 +332,8 @@
           <div class="neto-val" id="netoVal">S/ 0.00</div>
         </div>
         <div class="result-row"><span class="lbl">Remuneración por días</span><span class="val" id="rDias">S/ 0.00</span></div>
-        <div class="result-row"><span class="lbl">Horas extra (25% + 35%)</span><span class="val" id="rExtras">S/ 0.00</span></div>
+        <div class="result-row"><span class="lbl">Horas extra al 25%</span><span class="val" id="rExtras25">S/ 0.00</span></div>
+        <div class="result-row"><span class="lbl">Horas extra al 35%</span><span class="val" id="rExtras35">S/ 0.00</span></div>
         <div class="result-row bono"><span class="lbl">Bono nocturno</span><span class="val" id="rBono">S/ 0.00</span></div>
         <div class="result-row"><span class="lbl">Remuneración bruta</span><span class="val" id="rBruta">S/ 0.00</span></div>
         <div class="result-row disc"><span class="lbl">Descuento ONP/AFP</span><span class="val" id="rDesc">S/ 0.00</span></div>
@@ -369,13 +390,15 @@ const tasasAFP = { Integra: 0.1275, Prima: 0.1280, Profuturo: 0.1280, Habitat: 0
 const TASA_ONP = 0.13;
 let turno = "NOCHE";
 let hist = [];
+let guestMode = false;
 let chartNeto = null, chartComp = null;
 
 /* ============ CÁLCULO ============ */
 function calcular() {
   const bruto = num("bruto");
   const dias = clamp(num("dias"), 1, 30);
-  const hextra = num("hextra");
+  const hextra25 = num("hextra25");
+  const hextra35 = num("hextra35");
   const jornada = clamp(num("jornada"), 1, 12);
   const sistema = val("sistema");
   const afp = val("afp");
@@ -384,15 +407,16 @@ function calcular() {
   const uit = num("uit");
   const rDias = bruto * (dias / 30);
   const vHora = (bruto / 30) / jornada;
-  const p25 = Math.min(hextra, 2) * vHora * 1.25;
-  const p35 = Math.max(0, hextra - 2) * vHora * 1.35;
+  const p25 = hextra25 * vHora * 1.25;
+  const p35 = hextra35 * vHora * 1.35;
+  const hextra = hextra25 + hextra35;
   const bonoNoches = turno === "DIA" ? 0 : (turno === "NOCHE" ? dias : diasNoche);
   const rBono = (bruto / 30) * bonoTasa * bonoNoches;
   const rBruta = rDias + p25 + p35 + rBono;
   const tasa = sistema === "ONP" ? TASA_ONP : (tasasAFP[afp] ?? 0.125);
   const rDesc = rBruta * tasa;
   const rRenta = rentaMensual(rBruta, uit);
-  return { bruto, dias, hextra, jornada, sistema, afp, turno, diasNoche,
+  return { bruto, dias, hextra, hextra25, hextra35, jornada, sistema, afp, turno, diasNoche,
     rDias, vHora, p25, p35, rBono, rBruta, rDesc, rRenta,
     neto: rBruta - rDesc - rRenta };
 }
@@ -425,7 +449,8 @@ function render() {
   const c = calcular();
   animateValue(document.getElementById("netoVal"), c.neto);
   setText("rDias", fmt(c.rDias));
-  setText("rExtras", fmt(c.p25+c.p35));
+  setText("rExtras25", fmt(c.p25));
+  setText("rExtras35", fmt(c.p35));
   setText("rBono", fmt(c.rBono));
   setText("rBruta", fmt(c.rBruta));
   setText("rDesc", fmt(c.rDesc));
@@ -448,6 +473,7 @@ document.getElementById("sistema").addEventListener("change", e=>{
 
 /* ============ GUARDAR / BORRAR ============ */
 async function guardarMes() {
+  if (guestMode) { toast("Modo invitado: inicia sesión con GitHub para guardar"); return; }
   const c = render();
   const now = new Date();
   const anio = now.getFullYear(), mes = now.getMonth()+1;
@@ -459,6 +485,7 @@ async function guardarMes() {
   const { error } = await sb.from("sueldos").insert({
     usuario_id: profile.id, mes, anio,
     sueldo_bruto: c.bruto, dias_trabajados: c.dias, horas_extra: c.hextra,
+    horas_extra_25: c.hextra25, horas_extra_35: c.hextra35,
     tipo_turno: c.turno, dias_noche: c.diasNoche, tasa_bono: c.bonoTasa,
     sistema_prev: c.sistema, afp: c.afp, bono_nocturno: c.rBono,
     remuneracion_bruta: c.rBruta, descuento_prev: c.rDesc,
@@ -481,13 +508,14 @@ async function exportarPDF(c) {
       <tr style="background:#f5f5f7;"><th style="text-align:left; padding:8px; border-bottom:1px solid #ddd;">Concepto</th><th style="text-align:right; padding:8px; border-bottom:1px solid #ddd;">Monto (S/)</th></tr>
       <tr><td style="padding:6px 8px;">Sueldo bruto mensual</td><td style="text-align:right; padding:6px 8px;">${fmt(c.bruto)}</td></tr>
       <tr style="background:#fafafa;"><td style="padding:6px 8px;">Días trabajados</td><td style="text-align:right; padding:6px 8px;">${c.dias}</td></tr>
-      <tr><td style="padding:6px 8px;">Horas extra</td><td style="text-align:right; padding:6px 8px;">${c.hextra}h</td></tr>
-      <tr style="background:#fafafa;"><td style="padding:6px 8px;">Turno</td><td style="text-align:right; padding:6px 8px;">${c.turno}</td></tr>
-      <tr><td style="padding:6px 8px;">Sistema previsional</td><td style="text-align:right; padding:6px 8px;">${c.sistema}</td></tr>
-      <tr style="background:#fafafa;"><td style="padding:6px 8px;">Bono nocturno</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rBono)}</td></tr>
-      <tr><td style="padding:6px 8px;">Remuneración bruta</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rBruta)}</td></tr>
-      <tr style="background:#fafafa;"><td style="padding:6px 8px;">Descuento ONP/AFP</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rDesc)}</td></tr>
-      <tr><td style="padding:6px 8px;">Renta 5ta categoría</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rRenta)}</td></tr>
+      <tr><td style="padding:6px 8px;">Horas extra al 25%</td><td style="text-align:right; padding:6px 8px;">${c.hextra25}h</td></tr>
+      <tr style="background:#fafafa;"><td style="padding:6px 8px;">Horas extra al 35%</td><td style="text-align:right; padding:6px 8px;">${c.hextra35}h</td></tr>
+      <tr><td style="padding:6px 8px;">Turno</td><td style="text-align:right; padding:6px 8px;">${c.turno}</td></tr>
+      <tr style="background:#fafafa;"><td style="padding:6px 8px;">Sistema previsional</td><td style="text-align:right; padding:6px 8px;">${c.sistema}</td></tr>
+      <tr><td style="padding:6px 8px;">Bono nocturno</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rBono)}</td></tr>
+      <tr style="background:#fafafa;"><td style="padding:6px 8px;">Remuneración bruta</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rBruta)}</td></tr>
+      <tr><td style="padding:6px 8px;">Descuento ONP/AFP</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rDesc)}</td></tr>
+      <tr style="background:#fafafa;"><td style="padding:6px 8px;">Renta 5ta categoría</td><td style="text-align:right; padding:6px 8px;">${fmt(c.rRenta)}</td></tr>
       <tr style="background:#e8f0fe; font-weight:700;"><td style="padding:10px 8px; border-top:2px solid #0a84ff;">SUELDO NETO</td><td style="text-align:right; padding:10px 8px; border-top:2px solid #0a84ff; color:#0a84ff;">${fmt(c.neto)}</td></tr>
     </table>
     <p style="color:#6e6e73; font-size:0.75rem; margin-top:16px;">Generado el ${fecha} · Calculadora de Sueldo Neto — Perú</p>`;
@@ -544,17 +572,29 @@ function drawCharts(){
 /* ============ AUTH ============ */
 async function checkSession() {
   const { data: { session } } = await sb.auth.getSession();
-  if (session) { showApp(); await cargarHistorial(); }
+  if (session) { guestMode = false; showApp(session.user); await cargarHistorial(); }
   else { showLogin(); }
 }
-async function showApp() {
+async function showApp(user) {
   document.getElementById("loginScreen").style.display="none";
   document.getElementById("appSection").style.display="block";
+  document.getElementById("userArea").style.display="flex";
+  if (guestMode) {
+    document.getElementById("userBadge").textContent = "Invitado";
+    document.getElementById("logoutBtn").textContent = "Salir";
+    document.getElementById("histSub").textContent = "Modo invitado: los datos no se guardan.";
+  } else {
+    const meta = user?.user_metadata || {};
+    document.getElementById("userBadge").textContent = meta.name || meta.user_name || user?.email || "Usuario";
+    document.getElementById("logoutBtn").textContent = "Cerrar sesión";
+    document.getElementById("histSub").textContent = "Los datos se guardan en tu base de datos personal.";
+  }
   render();
 }
 function showLogin() {
   document.getElementById("loginScreen").style.display="flex";
   document.getElementById("appSection").style.display="none";
+  document.getElementById("userArea").style.display="none";
 }
 const btn = document.getElementById("btnGitHubLogin");
 if (btn) btn.addEventListener("click", async ()=>{
@@ -572,8 +612,29 @@ if (btn) btn.addEventListener("click", async ()=>{
     console.error(e);
   }
 });
+// Modo invitado: probar la página sin cuenta ni historial
+const btnGuest = document.getElementById("btnGuest");
+if (btnGuest) btnGuest.addEventListener("click", ()=>{
+  guestMode = true;
+  hist = [];
+  showApp(null);
+  document.getElementById("tableWrap").innerHTML =
+    '<div class="empty">Modo invitado: la calculadora funciona al instante.<br>Tus cálculos no se guardan. Inicia sesión con GitHub para guardar tu historial mes a mes.</div>';
+  drawCharts();
+  toast("Modo invitado activo");
+});
+
+// Cerrar sesión / salir del modo invitado
+const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) logoutBtn.addEventListener("click", async ()=>{
+  if (guestMode) { guestMode = false; hist = []; showLogin(); toast("Sesión de invitado cerrada"); return; }
+  const { error } = await sb.auth.signOut();
+  guestMode = false; hist = [];
+  showLogin();
+  toast(error ? "Error al cerrar sesión" : "Sesión cerrada ✓");
+});
 // Detectar si viene del login OAuth
-if (sb) sb.auth.getSession().then(({ data: { session } })=>{ if (session) showApp(); });
+if (sb) sb.auth.getSession().then(({ data: { session } })=>{ if (session) { guestMode = false; showApp(session.user); cargarHistorial(); } });
 
 /* ============ TOAST ============ */
 let toastTimer=null;
@@ -586,7 +647,7 @@ themeBtn.addEventListener("click",()=>{ const n=document.body.dataset.theme==="d
 (function(){ const s=localStorage.getItem("sueldoTheme"); const sys=window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"; applyTheme(s||sys); })();
 
 /* ============ INIT ============ */
-if (sb && document.getElementById("refreshBtn")) document.getElementById("refreshBtn").addEventListener("click", cargarHistorial);
+if (sb && document.getElementById("refreshBtn")) document.getElementById("refreshBtn").addEventListener("click", ()=>{ if (guestMode) { toast("Modo invitado: no hay datos que recargar"); return; } cargarHistorial(); });
 if (sb) checkSession();
 </script>
 </body>
