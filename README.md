@@ -51,3 +51,11 @@ Ajusta los valores según tu boleta de pago. La UIT se edita en el campo de la p
 ## Nota
 
 Los valores son **referenciales**. Verifica siempre con tu boleta de pago y la normativa vigente de SUNAT/SBS/MTPE.
+
+## Seguridad
+
+- **RLS en Supabase**: cada usuario solo lee, inserta, actualiza y borra sus propios registros.
+- **Login exclusivo con GitHub** (OAuth); el registro por email está desactivado.
+- **CSP estricta**, SRI (integrity) en las librerías de CDN y cabeceras de seguridad (`_headers`).
+- Un solo registro por usuario/mes (restricción única en la BD).
+- La clave anónima de Supabase es pública por diseño; RLS protege los datos. No compartas ni subas una clave `service_role`.
