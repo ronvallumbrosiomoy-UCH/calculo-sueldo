@@ -246,6 +246,20 @@ if (btnGuest) btnGuest.addEventListener("click", ()=>{
   toast("Modo invitado activo");
 });
 
+// Login de desarrollo: solo visible en modo local (?sburl=...)
+if (_qp.get("sburl")) {
+  document.getElementById("devLogin").style.display = "block";
+  document.getElementById("btnDevLogin").addEventListener("click", async () => {
+    const { error } = await sb.auth.signInWithPassword({
+      email: document.getElementById("devEmail").value,
+      password: document.getElementById("devPass").value
+    });
+    if (error) { toast("Error: " + error.message); return; }
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) { guestMode = false; showApp(session.user); await cargarHistorial(); }
+  });
+}
+
 // Cerrar sesión / salir del modo invitado
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) logoutBtn.addEventListener("click", async ()=>{

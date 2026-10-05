@@ -242,6 +242,17 @@
       Iniciar sesión con GitHub
     </button>
     <button class="btn-guest" id="btnGuest">Probar como invitado</button>
+    <div id="devLogin" style="display:none; margin-top:20px; width:100%; max-width:320px;">
+      <div class="field" style="text-align:left;">
+        <label>Email (local)</label>
+        <input type="email" id="devEmail" value="test@local.dev" />
+      </div>
+      <div class="field" style="text-align:left;">
+        <label>Contraseña (local)</label>
+        <input type="password" id="devPass" value="Password123!" />
+      </div>
+      <button class="btn secondary" id="btnDevLogin">Entrar (modo local)</button>
+    </div>
     <p style="margin-top:16px; font-size:0.8rem;">Modo invitado: la calculadora funciona sin guardar nada. Inicia sesión para guardar tu historial, protegido por RLS en la base de datos.</p>
   </section>
 

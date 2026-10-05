@@ -15,6 +15,14 @@ insert into auth.users (
   now(), now(), '', '', 'authenticated', 'authenticated'
 ) on conflict (id) do nothing;
 
+-- GoTrue espera estas columnas no-nulas; el insert directo las deja en NULL
+update auth.users set
+  confirmation_token = '',
+  email_change_token_new = '',
+  email_change_token_current = '',
+  recovery_token = ''
+where id = '11111111-1111-1111-1111-111111111111';
+
 do $$
 declare
   v_uid uuid := '11111111-1111-1111-1111-111111111111';

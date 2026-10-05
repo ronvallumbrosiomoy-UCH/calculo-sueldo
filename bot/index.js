@@ -176,9 +176,10 @@ async function cmdStart(chatId) {
   if (!u) {
     await send(chatId,
       '👋 Calculadora de Sueldo — Bot de presupuestos\n\n' +
-      'Este chat aún no está vinculado a una cuenta.\n' +
+      'Este chat no está vinculado a ninguna cuenta.\n' +
       '1. Abre la página y usa "Vincular Telegram", o\n' +
-      '2. Envía /vincular <codigo> si tienes un código.');
+      '2. Envía /vincular <codigo> si tienes un código.\n\n' +
+      `(Tu chat_id es: ${chatId} — úsalo para vincular en local)`);
     return;
   }
   const ingreso = await db.ingresoMes(u.uid, hoy().mes, hoy().anio);
