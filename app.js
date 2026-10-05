@@ -1,7 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.116.0';
 /* ============ SUPABASE ============ */
-const supabaseUrl = 'https://qnxudmepbmxdqgrivnhr.supabase.co';
-const supabaseAnon = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFueHVkbWVwYm14ZHFncml2bmhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MTAyMjAsImV4cCI6MjEwNTQ4NjIyMH0.9r1bhAFvkHN3efZk2I3tJmBWfekKjV0XeqorcvChDDY';
+const _qp = new URLSearchParams(location.search);
+const supabaseUrl = _qp.get('sburl') || 'https://qnxudmepbmxdqgrivnhr.supabase.co';
+const supabaseAnon = _qp.get('sbkey') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFueHVkbWVwYm14ZHFncml2bmhyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MTAyMjAsImV4cCI6MjEwNTQ4NjIyMH0.9r1bhAFvkHN3efZk2I3tJmBWfekKjV0XeqorcvChDDY';
 const sb = createClient(supabaseUrl, supabaseAnon);
 
 /* ============ ESTADO ============ */

@@ -1,0 +1,15 @@
+{
+  "name": "calculo-sueldo-bot",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test-local.mjs"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@supabase/supabase-js": "^2.49.0",
+    "dotenv": "^16.4.5"
+  }
+}
